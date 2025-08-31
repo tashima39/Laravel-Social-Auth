@@ -1,61 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CCS4360 - Laravel Social Auth Project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel application demonstrating user authentication via Google OAuth (using Laravel Socialite) and integration with Google APIs (Gmail, Calendar, Tasks) to display user data.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+*   **Google OAuth Login:** Users can securely log in using their Google accounts.
+*   **Dashboard:** A central hub after successful login.
+*   **Google API Integration:** Fetches and displays user data from:
+    *   **Google Calendar:** Upcoming events in a clean table.
+    *   **Gmail:** Latest emails with sender, subject, and date.
+    *   **Google Tasks:** Current tasks with their status and due dates.
+*   **Responsive UI:** Built with Laravel Breeze for a clean and functional interface.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Prerequisites
 
-## Learning Laravel
+Before you begin, ensure you have the following installed on your local machine:
+*   PHP (>= 8.1)
+*   Composer
+*   Node.js and npm
+*   Git
+*   A local development environment (Laragon)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation & Setup
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Follow these steps to get the project running on your local machine.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/tashima39/Laravel-Social-Auth.git
+cd Laravel-Social-Auth 
+```
 
-## Laravel Sponsors
+### 2. Install PHP Dependencies
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Install NPM Dependencies and Build Assets
+```bash
+npm install
+npm run build
+```
 
-### Premium Partners
+### 4. Environment Configuration
+Copy the example environment file and generate an application key.
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Edit the `.env` file and configure your database connection (SQLite, MySQL). For a simple setup with SQLite:
+```bash
+touch database/database.sqlite
+```
+Then set in your `.env`:
+```
+DB_CONNECTION=sqlite
+```
 
-## Contributing
+### 5. Database Migration
+Run the migrations to create the necessary tables, including the modified `users` table for storing Google tokens.
+```bash
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 6. Google OAuth Setup
+This is a crucial step for the application to function.
 
-## Code of Conduct
+1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2.  Create a new project or select an existing one.
+3.  Configure the **OAuth consent screen** (External).
+4.  Navigate to **Credentials** and create a new **OAuth 2.0 Client ID**.
+5.  Set the **Application type** to `Web application`.
+6.  Under **Authorized redirect URIs**, add:
+    `http://127.0.0.1:8000/auth/google/callback`
+7.  Note down your `Client ID` and `Client Secret`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Now, add these credentials to your Laravel `.env` file:
+```
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback
+```
 
-## Security Vulnerabilities
+Also, ensure these are linked in `config/services.php`:
+```php
+'google' => [
+    'client_id' => env('GOOGLE_CLIENT_ID'),
+    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    'redirect' => env('GOOGLE_REDIRECT_URI'),
+],
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 7. Clear Configuration Cache
+It's essential to clear any cached configuration to ensure your new `.env` settings are loaded.
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+```
 
-## License
+### 8. Run the Application
+You can now start the Laravel development server:
+```bash
+php artisan serve
+```
+For frontend css, run in a separate terminal:
+```bash
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Visit `http://127.0.0.1:8000` in your browser. Click **Login**, then **Continue with Google** to test the authentication flow.
+
+## Usage
+
+1.  Navigate to the application's login page.
+2.  Click on "Continue with Google".
+3.  You will be redirected to Google to authenticate and grant permissions.
+4.  Upon successful authentication, you will be redirected to the dashboard.
+5.  From the dashboard, you can navigate to the Calendar, Emails, and To-Dos pages to view your data fetched from your Google account.
+
+
+## Technologies Used
+
+*   **Backend:** Laravel (PHP)
+*   **Authentication:** Laravel Breeze, Laravel Socialite
+*   **Google APIs:** Google API Client Library
+*   **Frontend:** Blade Templating, Tailwind CSS
+*   **Database:** SQLite
+*   **Development:** Laragon
+
+---
+
+This project was completed for CCS4360 Techniques in Social Media assignment.
+
+```
