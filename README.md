@@ -15,7 +15,6 @@ A Laravel application demonstrating user authentication via Google OAuth (using 
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed on your local machine:
 *   PHP (>= 8.1)
 *   Composer
 *   Node.js and npm
@@ -24,7 +23,6 @@ Before you begin, ensure you have the following installed on your local machine:
 
 ## Installation & Setup
 
-Follow these steps to get the project running on your local machine.
 
 ### 1. Clone the Repository
 ```bash
@@ -44,13 +42,13 @@ npm run build
 ```
 
 ### 4. Environment Configuration
-Copy the example environment file and generate an application key.
+
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-Edit the `.env` file and configure your database connection (SQLite, MySQL). For a simple setup with SQLite:
+Edit the `.env` file and configure your database connection (SQLite).
 ```bash
 touch database/database.sqlite
 ```
@@ -60,13 +58,12 @@ DB_CONNECTION=sqlite
 ```
 
 ### 5. Database Migration
-Run the migrations to create the necessary tables, including the modified `users` table for storing Google tokens.
+Create necessary tables, including modified `users` table for storing Google tokens.
 ```bash
 php artisan migrate
 ```
 
 ### 6. Google OAuth Setup
-This is a crucial step for the application to function.
 
 1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
 2.  Create a new project or select an existing one.
@@ -75,16 +72,16 @@ This is a crucial step for the application to function.
 5.  Set the **Application type** to `Web application`.
 6.  Under **Authorized redirect URIs**, add:
     `http://127.0.0.1:8000/auth/google/callback`
-7.  Note down your `Client ID` and `Client Secret`.
+7.  Note down the `Client ID` and `Client Secret`.
 
-Now, add these credentials to your Laravel `.env` file:
+Add the credentials to your Laravel `.env` file:
 ```
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback
 ```
 
-Also, ensure these are linked in `config/services.php`:
+Ensure these are linked in `config/services.php`:
 ```php
 'google' => [
     'client_id' => env('GOOGLE_CLIENT_ID'),
@@ -94,7 +91,7 @@ Also, ensure these are linked in `config/services.php`:
 ```
 
 ### 7. Clear Configuration Cache
-It's essential to clear any cached configuration to ensure your new `.env` settings are loaded.
+Clear cached configuration to ensure new `.env` settings are loaded.
 ```bash
 php artisan config:clear
 php artisan cache:clear
@@ -103,16 +100,16 @@ php artisan view:clear
 ```
 
 ### 8. Run the Application
-You can now start the Laravel development server:
+Start the Laravel development server:
 ```bash
 php artisan serve
 ```
-For frontend css, run in a separate terminal:
+Run in a separate terminal for frontend CSS (Tailwind):
 ```bash
 npm run dev
 ```
 
-Visit `http://127.0.0.1:8000` in your browser. Click **Login**, then **Continue with Google** to test the authentication flow.
+Go to `http://127.0.0.1:8000` in your browser. Click **Login**, then **Continue with Google** to test the authentication flow.
 
 ## Usage
 
